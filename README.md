@@ -5,7 +5,7 @@ cmake -S llvm -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECT
 ```
 
 ```bash
-ninja -C build clang -j$(nproc)
+ninja -C build clang
 ```
 
 # CIR practice
