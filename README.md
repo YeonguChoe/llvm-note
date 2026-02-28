@@ -96,6 +96,18 @@ ninja -C build clang
   }
 ```
 
+- CIR Test (builtins-floating-point.c)
+```c
+int fpclassify(float f) {
+  return __builtin_fpclassify(0, 1, 2, 3, 4, f);
+  // CIR: %{{.*}} = cir.is_fp_class %{{.*}}, fcNan : (!cir.float) -> !cir.bool
+  // LLVM: %{{.*}} = call i1 @llvm.is.fpclass.f32(float %{{.*}}, i32 {{.*}})
+  // OGCG: %{{.*}} = fcmp uno float %{{.*}}, %{{.*}}
+}
+```
+
+### LLVM project
+
 ```cpp
     CodeGenFunction::CGFPOptionsRAII FPOptsRAII(*this, E);
     Value *V = EmitScalarExpr(E->getArg(5));
