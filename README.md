@@ -84,7 +84,7 @@ ninja -C build clang
                           mlir::ValueRange{SubnormalLiteral},
                           mlir::ValueRange{});
 
-    // ^ZeroBlock: unconditionally -> End(ZeroLiteral)
+    // ^ZeroBlock: unconditional -> End(ZeroLiteral)
     builder.setInsertionPointToEnd(ZeroBlock);
     cir::BrOp::create(builder, Loc, EndBlock, mlir::ValueRange{ZeroLiteral});
 
