@@ -47,11 +47,11 @@ ninja -C build clang
     mlir::Region *Region = EntryBlock->getParent();
 
     // EndBlock: 최종 결과를 블록 인자로 받음
-    mlir::Block *EndBlock = builder.createBlock(Region, Region->end());
     mlir::Block *InfBlock = builder.createBlock(Region, Region->end());
     mlir::Block *NormalBlock = builder.createBlock(Region, Region->end());
     mlir::Block *SubnormalBlock = builder.createBlock(Region, Region->end());
     mlir::Block *ZeroBlock = builder.createBlock(Region, Region->end());
+    mlir::Block *EndBlock = builder.createBlock(Region, Region->end());
     EndBlock->addArgument(ResultTy, Loc);
 
     // --- EntryBlock: IsNaN ---
