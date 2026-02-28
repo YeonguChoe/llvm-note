@@ -41,39 +41,42 @@ ninja -C build clang
     mlir::Value ZeroLiteral = emitScalarExpr(e->getArg(4));
     mlir::Value V = emitScalarExpr(e->getArg(5));
 
+    mlir::Type ResultTy =
+        convertType(e->getType()); // ConvertType -> convertType
     mlir::Block *EntryBlock = builder.getInsertionBlock();
     mlir::Region *Region = EntryBlock->getParent();
 
+    // EndBlock: 최종 결과를 블록 인자로 받음
+    mlir::Block *EndBlock = builder.createBlock(Region, Region->end());
     mlir::Block *InfBlock = builder.createBlock(Region, Region->end());
     mlir::Block *NormalBlock = builder.createBlock(Region, Region->end());
     mlir::Block *SubnormalBlock = builder.createBlock(Region, Region->end());
     mlir::Block *ZeroBlock = builder.createBlock(Region, Region->end());
-
-    mlir::Block *EndBlock = builder.createBlock(Region, Region->end());
-    mlir::Type ResultTy = convertType(e->getType());
     EndBlock->addArgument(ResultTy, Loc);
 
-    // ^Entry: if NaN -> End(NanLiteral), else -> InfBlock
+    // --- EntryBlock: IsNaN ---
     builder.setInsertionPointToEnd(EntryBlock);
     mlir::Value IsNan = builder.createIsFPClass(Loc, V, cir::FPClassTest::Nan);
-    cir::BrCondOp::create(builder, Loc, IsNan, EndBlock, InfBlock,
-                          mlir::ValueRange{NanLiteral}, mlir::ValueRange{});
+    cir::BrCondOp::create(builder, Loc, IsNan, EndBlock,
+                          InfBlock, // destTrue, destFalse
+                          mlir::ValueRange{NanLiteral},
+                          mlir::ValueRange{}); // operandsTrue, operandsFalse
 
-    // ^InfBlock: if Inf -> End(InfLiteral), else -> NormalBlock
+    // --- InfBlock: IsInf ---
     builder.setInsertionPointToEnd(InfBlock);
     mlir::Value IsInf =
         builder.createIsFPClass(Loc, V, cir::FPClassTest::Infinity);
     cir::BrCondOp::create(builder, Loc, IsInf, EndBlock, NormalBlock,
                           mlir::ValueRange{InfLiteral}, mlir::ValueRange{});
 
-    // ^NormalBlock: if Normal -> End(NormalLiteral), else -> SubnormalBlock
+    // --- NormalBlock: IsNormal ---
     builder.setInsertionPointToEnd(NormalBlock);
     mlir::Value IsNormal =
         builder.createIsFPClass(Loc, V, cir::FPClassTest::Normal);
     cir::BrCondOp::create(builder, Loc, IsNormal, EndBlock, SubnormalBlock,
                           mlir::ValueRange{NormalLiteral}, mlir::ValueRange{});
 
-    // ^SubnormalBlock: if Subnormal -> End(SubnormalLiteral), else -> ZeroBlock
+    // --- SubnormalBlock: IsSubnormal ---
     builder.setInsertionPointToEnd(SubnormalBlock);
     mlir::Value IsSubnormal =
         builder.createIsFPClass(Loc, V, cir::FPClassTest::Subnormal);
@@ -81,11 +84,11 @@ ninja -C build clang
                           mlir::ValueRange{SubnormalLiteral},
                           mlir::ValueRange{});
 
-    // ^ZeroBlock: unconditionally -> End(ZeroLiteral)
+    // --- ZeroBlock ---
     builder.setInsertionPointToEnd(ZeroBlock);
     cir::BrOp::create(builder, Loc, EndBlock, mlir::ValueRange{ZeroLiteral});
 
-    // ^EndBlock(x)
+    // --- EndBlock에서 결과 반환 ---
     builder.setInsertionPointToEnd(EndBlock);
     mlir::Value Result = EndBlock->getArgument(0);
 
