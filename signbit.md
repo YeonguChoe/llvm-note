@@ -18,7 +18,7 @@ return RValue::get(builder.createBoolToInt(signbit, convertType(e->getType())));
 // RUN: %clang_cc1 -fclangir -emit-llvm %s -o %t.cir.ll
 // RUN: FileCheck --input-file=%t.cir.ll %s -check-prefix=LLVM
 // RUN: %clang_cc1 -emit-llvm %s -o %t.ll
-// RUN: FileCheck --input-file=%t.ll %s -check-prefix=OGCG
+// RUN: FileCheck --input-file=%t.ll %s -check-prefix=LLVM
 
 int test_signbit_float(float x) {
   return __builtin_signbit(x);
@@ -28,8 +28,6 @@ int test_signbit_float(float x) {
 // LLVM: icmp slt i32 {{.*}}, 0
 // LLVM: zext i1 {{.*}} to i32
 // LLVM: ret i32
-// OGCG: call i1 @llvm.is.fpclass.f32(float {{.*}}, i32 128)
-
 
 int test_signbit_double(double x) {
   return __builtin_signbit(x);
@@ -39,7 +37,6 @@ int test_signbit_double(double x) {
 // LLVM:       icmp slt i64 {{.*}}, 0
 // LLVM:       zext i1 {{.*}} to i32
 // LLVM:       ret i32
-// OGCG:       call i1 @llvm.is.fpclass.f64(double {{.*}}, i32 128)
 
 int test_signbit_long_double(long double x) {
   return __builtin_signbit(x);
@@ -49,7 +46,6 @@ int test_signbit_long_double(long double x) {
 // LLVM:       icmp slt i80 {{.*}}, 0
 // LLVM:       zext i1 {{.*}} to i32
 // LLVM:       ret i32
-// OGCG: call i1 @llvm.is.fpclass.f80(x86_fp80 {{.*}}, i32 128)
 
 int test_signbitf(float x) {
   return __builtin_signbitf(x);
@@ -59,7 +55,6 @@ int test_signbitf(float x) {
 // LLVM:       icmp slt i32 {{.*}}, 0
 // LLVM:       zext i1 {{.*}} to i32
 // LLVM:       ret i32
-// OGCG: call i1 @llvm.is.fpclass.f32(float {{.*}}, i32 128)
 
 int test_signbitl(long double x) {
   return __builtin_signbitl(x);
@@ -69,5 +64,4 @@ int test_signbitl(long double x) {
 // LLVM:       icmp slt i80 {{.*}}, 0
 // LLVM:       zext i1 {{.*}} to i32
 // LLVM:       ret i32
-// OGCG: call i1 @llvm.is.fpclass.f80(x86_fp80 {{.*}}, i32 128)
 ```
