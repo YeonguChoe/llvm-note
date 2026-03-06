@@ -33,35 +33,35 @@ int test_signbit_double(double x) {
   return __builtin_signbit(x);
 }
 // CIR: cir.signbit %{{.*}} : !cir.double -> !cir.bool
-// LLVM:       bitcast double {{.*}} to i64
-// LLVM:       icmp slt i64 {{.*}}, 0
-// LLVM:       zext i1 {{.*}} to i32
-// LLVM:       ret i32
+// LLVM: bitcast double {{.*}} to i64
+// LLVM: icmp slt i64 {{.*}}, 0
+// LLVM: zext i1 {{.*}} to i32
+// LLVM: ret i32
 
 int test_signbit_long_double(long double x) {
   return __builtin_signbit(x);
 }
 // CIR: cir.signbit %{{.*}} : !cir.long_double<!cir.f80> -> !cir.bool
-// LLVM:       bitcast x86_fp80 {{.*}} to i80
-// LLVM:       icmp slt i80 {{.*}}, 0
-// LLVM:       zext i1 {{.*}} to i32
-// LLVM:       ret i32
+// LLVM: bitcast x86_fp80 {{.*}} to i80
+// LLVM: icmp slt i80 {{.*}}, 0
+// LLVM: zext i1 {{.*}} to i32
+// LLVM: ret i32
 
 int test_signbitf(float x) {
   return __builtin_signbitf(x);
 }
 // CIR: cir.signbit %{{.*}} : !cir.float -> !cir.bool
-// LLVM:       bitcast float {{.*}} to i32
-// LLVM:       icmp slt i32 {{.*}}, 0
-// LLVM:       zext i1 {{.*}} to i32
-// LLVM:       ret i32
+// LLVM: bitcast float {{.*}} to i32
+// LLVM: icmp slt i32 {{.*}}, 0
+// LLVM: zext i1 {{.*}} to i32
+// LLVM: ret i32
 
 int test_signbitl(long double x) {
   return __builtin_signbitl(x);
 }
 // CIR: cir.signbit %{{.*}} : !cir.long_double<!cir.f80> -> !cir.bool
-// LLVM:       bitcast x86_fp80 {{.*}} to i80
-// LLVM:       icmp slt i80 {{.*}}, 0
-// LLVM:       zext i1 {{.*}} to i32
-// LLVM:       ret i32
+// LLVM: bitcast x86_fp80 {{.*}} to i80
+// LLVM: icmp slt i80 {{.*}}, 0
+// LLVM: zext i1 {{.*}} to i32
+// LLVM: ret i32
 ```
