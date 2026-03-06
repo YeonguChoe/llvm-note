@@ -24,7 +24,10 @@ int test_signbit_float(float x) {
   return __builtin_signbit(x);
 }
 // CIR: cir.signbit %{{.*}} : !cir.float -> !cir.bool
-// LLVM: call i1 @llvm.is.fpclass.f32(float {{.*}}, i32 128)
+// LLVM: bitcast float {{.*}} to i32
+// LLVM: icmp slt i32 {{.*}}, 0
+// LLVM: zext i1 {{.*}} to i32
+// LLVM: ret i32
 // OGCG: call i1 @llvm.is.fpclass.f32(float {{.*}}, i32 128)
 
 
@@ -32,7 +35,10 @@ int test_signbit_double(double x) {
   return __builtin_signbit(x);
 }
 // CIR: cir.signbit %{{.*}} : !cir.double -> !cir.bool
-// LLVM:       call i1 @llvm.is.fpclass.f64(double {{.*}}, i32 128)
+// LLVM:       bitcast double {{.*}} to i64
+// LLVM:       icmp slt i64 {{.*}}, 0
+// LLVM:       zext i1 {{.*}} to i32
+// LLVM:       ret i32
 // OGCG:       call i1 @llvm.is.fpclass.f64(double {{.*}}, i32 128)
 
 int test_signbit_long_double(long double x) {
