@@ -8,60 +8,62 @@
 - clang/test/Headers/nvptx_device_math_macro.cpp
 
 ```cpp
-case Builtin::BI__builtin_fpclassify: {
-  // Order: FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO
-  CodeGenFunction::CGFPOptionsRAII FPOptsRAII(*this, E);
-  Value *V = EmitScalarExpr(E->getArg(5));
+  case Builtin::BI__builtin_fpclassify: {
+    CodeGenFunction::CGFPOptionsRAII FPOptsRAII(*this, E);
 
-  BasicBlock *Entry = Builder.GetInsertBlock();
+    Value *NanLiteral = EmitScalarExpr(E->getArg(0));
+    Value *InfiniteLiteral = EmitScalarExpr(E->getArg(1));
+    Value *NormalLiteral = EmitScalarExpr(E->getArg(2));
+    Value *SubnormalLiteral = EmitScalarExpr(E->getArg(3));
+    Value *ZeroLiteral = EmitScalarExpr(E->getArg(4));
+    Value *V = EmitScalarExpr(E->getArg(5));
 
-  BasicBlock *End = createBasicBlock("fpclassify_end", CurFn);
-  Builder.SetInsertPoint(End);
-  PHINode *Result = Builder.CreatePHI(ConvertType(E->getArg(0)->getType()), 5,
-                                      "fpclassify_result");
+    BasicBlock *Entry = Builder.GetInsertBlock();
+    BasicBlock *NotNan = createBasicBlock("fpclassify_not_nan", CurFn);
+    BasicBlock *NotInfinite = createBasicBlock("fpclassify_not_inf", CurFn);
+    BasicBlock *NotNormal = createBasicBlock("fpclassify_not_normal", CurFn);
+    BasicBlock *NotSubnormal =
+        createBasicBlock("fpclassify_not_subnormal", CurFn);
+    BasicBlock *End = createBasicBlock("fpclassify_end", CurFn);
 
-  // Entry block
-  Builder.SetInsertPoint(Entry);
-  Value *IsNan = Builder.createIsFPClass(V, FPClassTest::fcNan);
-  BasicBlock *NotNan = createBasicBlock("fpclassify_not_nan", CurFn);
-  Value *NanLiteral = EmitScalarExpr(E->getArg(0));
-  Result->addIncoming(NanLiteral, Entry);
-  Builder.CreateCondBr(IsNan, End, NotNan);
+    // End block
+    Builder.SetInsertPoint(End);
+    PHINode *Result = Builder.CreatePHI(ConvertType(E->getArg(0)->getType()), 5,
+                                        "fpclassify_result");
 
-  // NotNan block
-  Builder.SetInsertPoint(NotNan);
-  Value *IsInf = Builder.createIsFPClass(V, FPClassTest::fcInf);
-  BasicBlock *NotInf = createBasicBlock("fpclassify_not_inf", CurFn);
-  Value *InfLiteral = EmitScalarExpr(E->getArg(1));
-  Result->addIncoming(InfLiteral, NotNan);
-  Builder.CreateCondBr(IsInf, End, NotInf);
+    // Entry block
+    Builder.SetInsertPoint(Entry);
+    Value *IsNan = Builder.createIsFPClass(V, FPClassTest::fcNan);
+    Result->addIncoming(NanLiteral, Entry);
+    Builder.CreateCondBr(IsNan, End, NotNan);
 
-  // NotInf block
-  Builder.SetInsertPoint(NotInf);
-  Value *IsNormal = Builder.createIsFPClass(V, FPClassTest::fcNormal);
-  BasicBlock *NotNormal = createBasicBlock("fpclassify_not_normal", CurFn);
-  Value *NormalLiteral = EmitScalarExpr(E->getArg(2));
-  Result->addIncoming(NormalLiteral, NotInf);
-  Builder.CreateCondBr(IsNormal, End, NotNormal);
+    // NotNan block
+    Builder.SetInsertPoint(NotNan);
+    Value *IsInf = Builder.createIsFPClass(V, FPClassTest::fcInf);
+    Result->addIncoming(InfiniteLiteral, NotNan);
+    Builder.CreateCondBr(IsInf, End, NotInfinite);
 
-  // NotNormal block
-  Builder.SetInsertPoint(NotNormal);
-  Value *IsSubnormal = Builder.createIsFPClass(V, FPClassTest::fcSubnormal);
-  BasicBlock *NotSubnormal =
-      createBasicBlock("fpclassify_not_subnormal", CurFn);
-  Value *SubnormalLiteral = EmitScalarExpr(E->getArg(3));
-  Result->addIncoming(SubnormalLiteral, NotNormal);
-  Builder.CreateCondBr(IsSubnormal, End, NotSubnormal);
+    // NotInfinite block
+    Builder.SetInsertPoint(NotInfinite);
+    Value *IsNormal = Builder.createIsFPClass(V, FPClassTest::fcNormal);
+    Result->addIncoming(NormalLiteral, NotInfinite);
+    Builder.CreateCondBr(IsNormal, End, NotNormal);
 
-  // NotSubnormal block
-  Builder.SetInsertPoint(NotSubnormal);
-  Value *ZeroLiteral = EmitScalarExpr(E->getArg(4));
-  Result->addIncoming(ZeroLiteral, NotSubnormal);
-  Builder.CreateBr(End);
+    // NotNormal block
+    Builder.SetInsertPoint(NotNormal);
+    Value *IsSubnormal = Builder.createIsFPClass(V, FPClassTest::fcSubnormal);
+    Result->addIncoming(SubnormalLiteral, NotNormal);
+    Builder.CreateCondBr(IsSubnormal, End, NotSubnormal);
 
-  Builder.SetInsertPoint(End);
-  return RValue::get(Result);
-}
+    // NotSubnormal block
+    Builder.SetInsertPoint(NotSubnormal);
+    Result->addIncoming(ZeroLiteral, NotSubnormal);
+    Builder.CreateBr(End);
+
+    // End block
+    Builder.SetInsertPoint(End);
+    return RValue::get(Result);
+  }
 ```
 
 ```python
