@@ -125,4 +125,20 @@ void test_fpclassify(double d) {
 }
 ```
 
+- builtin.c
+
+```c
+  resld = __builtin_fabsl(LD);
+  // CHECK: call float @llvm.fabs.f32(float
+  // CHECK: call double @llvm.fabs.f64(double
+  // CHECK: call [[LDTYPE]] @llvm.fabs.[[LDLLVMTY:[a-z0-9]+]]([[LDTYPE]]
+```
+
+```c
+  ul = __builtin_bswapg(ul);
+  // CHECK: call [[LDLLVMTY:[a-z0-9]+]] @llvm.bswap.[[LONGINTTY]]
+```
+
+
+
 - clang/test/Headers/nvptx_device_math_macro.cpp
