@@ -1,5 +1,9 @@
 # Build
 
+- clang/lib/CIR/Lowering/DirectToLLVM/LowerToLLVM.cpp
+- clang/include/clang/CIR/Dialect/Builder/CIRBaseBuilder.h
+- clang/include/clang/CIR/Dialect/IR/CIROps.td
+
 ```bash
 cmake -S llvm -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_ENABLE_PROJECTS="clang;mlir" -DLLVM_TARGETS_TO_BUILD="host" -DLLVM_ENABLE_ASSERTIONS=ON -DLLVM_USE_LINKER=lld -DCLANG_ENABLE_CIR=ON
 ```
