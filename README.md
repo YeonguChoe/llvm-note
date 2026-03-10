@@ -8,6 +8,12 @@ cmake -S llvm -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=clan
 ninja -C build clang
 ```
 
+## Connecting to cloud
+
+```bash
+ssh -i <key>.pem ec2-user@<public-ip-address>
+```
+
 ## File to change
 
 - clang/lib/CIR/Lowering/DirectToLLVM/LowerToLLVM.cpp
