@@ -8,6 +8,10 @@ cmake -S llvm -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=clan
 ninja -C build clang
 ```
 
+```bash
+ninja -j9 && ninja check-clang -j9
+```
+
 ## Connecting to cloud
 
 ```bash
