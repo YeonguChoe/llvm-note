@@ -12,10 +12,10 @@ ninja -C build clang
 ninja -j9 && ninja check-clang -j9
 ```
 
-## Connecting to cloud
+# Test
 
 ```bash
-ssh -i <key>.pem ec2-user@<public-ip-address>
+build/bin/llvm-lit ../clang/test/CIR/<test-file>
 ```
 
 ## File to change
