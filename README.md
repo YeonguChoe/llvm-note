@@ -18,6 +18,12 @@ ninja -j9 && ninja check-clang -j9
 build/bin/llvm-lit ../clang/test/CIR/<test-file>
 ```
 
+# Lower C/C++ into CIR file
+
+```bash
+clang -fclangir -emit-cir <C/C++ filename>
+```
+
 ## File to change
 
 - clang/lib/CIR/Lowering/DirectToLLVM/LowerToLLVM.cpp
