@@ -11,3 +11,9 @@
     return RValue::get(builder.createBoolToInt(signBit, resultTy));
   }
 ```
+
+## builtin-signbit.c
+
+```c
+
+```
