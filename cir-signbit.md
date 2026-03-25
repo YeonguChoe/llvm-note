@@ -19,6 +19,8 @@
 // RUN: FileCheck %s --check-prefix=CIR --input-file %t.cir
 // RUN: %clang_cc1 -triple x86_64-unknown-linux-gnu -fclangir -emit-llvm %s -o %t-cir.ll
 // RUN: FileCheck %s --check-prefix=LLVM --input-file %t-cir.ll
+// RUN: %clang_cc1 -triple x86_64-unknown-linux-gnu -emit-llvm %s -o %t.ll
+// RUN: FileCheck %s --check-prefix=OGCG --input-file %t.ll
 
 void test_signbit_positive_zero(){
   double positiveZero = +0.0;
