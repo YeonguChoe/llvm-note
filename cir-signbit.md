@@ -25,4 +25,28 @@ void test_signbit_positive_zero(){
 // CIR: %[[CONST:.*]] = cir.const #cir.fp<{{.*}}> : !cir.double
 // CIR: cir.store align({{[0-9]+}}) %[[CONST]], %[[ALLOCA]] : !cir.double, !cir.ptr<!cir.double>
 }
+
+void test_signbit_negative_zero(){
+  double negativeZero = -0.0;
+  __builtin_signbit(negativeZero);
+// CIR: %[[ALLOCA:.*]] = cir.alloca !cir.double
+// CIR: %[[CONST:.*]] = cir.const #cir.fp<{{.*}}> : !cir.double
+// CIR: cir.store align({{[0-9]+}}) %[[CONST]], %[[ALLOCA]] : !cir.double, !cir.ptr<!cir.double>
+}
+
+void test_signbit_positive_number(){
+  double positiveNumber = 1.0;
+  __builtin_signbit(positiveNumber);
+// CIR: %[[ALLOCA:.*]] = cir.alloca !cir.double
+// CIR: %[[CONST:.*]] = cir.const #cir.fp<{{.*}}> : !cir.double
+// CIR: cir.store align({{[0-9]+}}) %[[CONST]], %[[ALLOCA]] : !cir.double, !cir.ptr<!cir.double>
+}
+
+void test_signbit_negative_number(){
+  double negativeNumber = -1.0;
+  __builtin_signbit(negativeNumber);
+// CIR: %[[ALLOCA:.*]] = cir.alloca !cir.double
+// CIR: %[[CONST:.*]] = cir.const #cir.fp<{{.*}}> : !cir.double
+// CIR: cir.store align({{[0-9]+}}) %[[CONST]], %[[ALLOCA]] : !cir.double, !cir.ptr<!cir.double>
+}
 ```
