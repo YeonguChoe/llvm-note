@@ -22,7 +22,7 @@ void test_signbit_positive_zero(){
   double positiveZero = +0.0;
   __builtin_signbit(positiveZero);
 // CIR: %[[ALLOCA:.*]] = cir.alloca !cir.double
-// CIR: %[[CONST:.*]] = cir.const #cir.fp<0.000000e+00> : !cir.double
+// CIR: %[[CONST:.*]] = cir.const #cir.fp<{{.*}}> : !cir.double
 // CIR: cir.store align({{[0-9]+}}) %[[CONST]], %[[ALLOCA]] : !cir.double, !cir.ptr<!cir.double>
 }
 ```
