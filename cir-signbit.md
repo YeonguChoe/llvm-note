@@ -6,10 +6,10 @@
     CIRGenFunction::CIRGenFPOptionsRAII fPOptsRAII(*this, e);
     mlir::Location loc = getLoc(e->getBeginLoc());
     mlir::Value value = emitScalarExpr(e->getArg(0));
-    cir::SignBitOp signBitOp = cir::SignBitOp::create(builder, loc, value);
-    mlir::Value result = signBitOp->getResult(0);
-    return RValue::get(
-        builder.createBoolToInt(result, convertType(e->getType())));
+    mlir::Operation *signBitOp = cir::SignBitOp::create(builder, loc, value);
+    mlir::Value result = builder.createBoolToInt(signBitOp->getResult(0),
+                                                 convertType(e->getType()));
+    return RValue::get(result);
   }
 ```
 
