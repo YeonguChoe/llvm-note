@@ -22,6 +22,12 @@ cmake -S llvm \
 ninja -j$(( $(nproc) / 2 ))
 ```
 
+## Search File
+
+```bash
+find . -name "*<file>*"
+```
+
 # Reset to Original Clone
 
 ## Reset Repository
@@ -29,9 +35,23 @@ ninja -j$(( $(nproc) / 2 ))
 git reset --hard HEAD
 ```
 
-## Reset File
+## Reset Repository Including Untracked Files
+
+```bash
+git clean -df
+```
+
+## Reset Specific File
 ```bash
 git restore <file>
+```
+
+# FileCheck
+
+## Update FileCheck Test File
+
+```bash
+python3 update_mir_test_checks.py --llc-binary build/bin/llc <test file>
 ```
 
 # Test
