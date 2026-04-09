@@ -46,14 +46,6 @@ git clean -df
 git restore <file>
 ```
 
-# FileCheck
-
-## Update FileCheck Test File
-
-```bash
-python3 update_mir_test_checks.py --llc-binary build/bin/llc <test file>
-```
-
 # Test
 
 ```bash
