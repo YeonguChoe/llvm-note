@@ -135,22 +135,22 @@ clang -ffp-exception-behavior=strict main.c -lm
 // CHECK-NEXT:    [[X_ADDR:%.*]] = alloca float, align 4
 // CHECK-NEXT:    store float [[X]], ptr [[X_ADDR]], align 4
 // CHECK-NEXT:    [[TMP0:%.*]] = load float, ptr [[X_ADDR]], align 4
-// CHECK-NEXT:    [[ISZERO:%.*]] = fcmp oeq float [[TMP0]], 0.000000e+00
-// CHECK-NEXT:    br i1 [[ISZERO]], label %[[FPCLASSIFY_END:.*]], label %[[FPCLASSIFY_NOT_ZERO:.*]]
-// CHECK:       [[FPCLASSIFY_END]]:
-// CHECK-NEXT:    [[FPCLASSIFY_RESULT:%.*]] = phi i32 [ 96, %[[ENTRY]] ], [ 3, %[[FPCLASSIFY_NOT_ZERO]] ], [ 516, %[[FPCLASSIFY_NOT_NAN:.*]] ], [ [[TMP2:%.*]], %[[FPCLASSIFY_NOT_INF:.*]] ]
-// CHECK-NEXT:    ret i32 [[FPCLASSIFY_RESULT]]
-// CHECK:       [[FPCLASSIFY_NOT_ZERO]]:
-// CHECK-NEXT:    [[CMP:%.*]] = fcmp uno float [[TMP0]], [[TMP0]]
-// CHECK-NEXT:    br i1 [[CMP]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_NAN]]
+// CHECK-NEXT:    [[TMP1:%.*]] = call i1 @llvm.is.fpclass.f32(float [[TMP0]], i32 3)
+// CHECK-NEXT:    br i1 [[TMP1]], label %[[FPCLASSIFY_END:.*]], label %[[FPCLASSIFY_NOT_NAN:.*]]
 // CHECK:       [[FPCLASSIFY_NOT_NAN]]:
-// CHECK-NEXT:    [[TMP1:%.*]] = call float @llvm.fabs.f32(float [[TMP0]]) #[[ATTR2:[0-9]+]]
-// CHECK-NEXT:    [[ISINF:%.*]] = fcmp oeq float [[TMP1]], 0x7FF0000000000000
-// CHECK-NEXT:    br i1 [[ISINF]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_INF]]
-// CHECK:       [[FPCLASSIFY_NOT_INF]]:
-// CHECK-NEXT:    [[ISNORMAL:%.*]] = fcmp uge float [[TMP1]], 0x3810000000000000
-// CHECK-NEXT:    [[TMP2]] = select i1 [[ISNORMAL]], i32 264, i32 144
+// CHECK-NEXT:    [[TMP2:%.*]] = call i1 @llvm.is.fpclass.f32(float [[TMP0]], i32 516)
+// CHECK-NEXT:    br i1 [[TMP2]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_INFINITE:.*]]
+// CHECK:       [[FPCLASSIFY_NOT_INFINITE]]:
+// CHECK-NEXT:    [[TMP3:%.*]] = call i1 @llvm.is.fpclass.f32(float [[TMP0]], i32 264)
+// CHECK-NEXT:    br i1 [[TMP3]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_NORMAL:.*]]
+// CHECK:       [[FPCLASSIFY_NOT_NORMAL]]:
+// CHECK-NEXT:    [[TMP4:%.*]] = call i1 @llvm.is.fpclass.f32(float [[TMP0]], i32 144)
+// CHECK-NEXT:    br i1 [[TMP4]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_SUBNORMAL:.*]]
+// CHECK:       [[FPCLASSIFY_NOT_SUBNORMAL]]:
 // CHECK-NEXT:    br label %[[FPCLASSIFY_END]]
+// CHECK:       [[FPCLASSIFY_END]]:
+// CHECK-NEXT:    [[FPCLASSIFY_RESULT:%.*]] = phi i32 [ 3, %[[ENTRY]] ], [ 516, %[[FPCLASSIFY_NOT_NAN]] ], [ 264, %[[FPCLASSIFY_NOT_INFINITE]] ], [ 144, %[[FPCLASSIFY_NOT_NORMAL]] ], [ 96, %[[FPCLASSIFY_NOT_SUBNORMAL]] ]
+// CHECK-NEXT:    ret i32 [[FPCLASSIFY_RESULT]]
 //
 int test_fpclassify_float(float x) {
   return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL,
@@ -163,22 +163,22 @@ int test_fpclassify_float(float x) {
 // CHECK-NEXT:    [[X_ADDR:%.*]] = alloca double, align 8
 // CHECK-NEXT:    store double [[X]], ptr [[X_ADDR]], align 8
 // CHECK-NEXT:    [[TMP0:%.*]] = load double, ptr [[X_ADDR]], align 8
-// CHECK-NEXT:    [[ISZERO:%.*]] = fcmp oeq double [[TMP0]], 0.000000e+00
-// CHECK-NEXT:    br i1 [[ISZERO]], label %[[FPCLASSIFY_END:.*]], label %[[FPCLASSIFY_NOT_ZERO:.*]]
-// CHECK:       [[FPCLASSIFY_END]]:
-// CHECK-NEXT:    [[FPCLASSIFY_RESULT:%.*]] = phi i32 [ 96, %[[ENTRY]] ], [ 3, %[[FPCLASSIFY_NOT_ZERO]] ], [ 516, %[[FPCLASSIFY_NOT_NAN:.*]] ], [ [[TMP2:%.*]], %[[FPCLASSIFY_NOT_INF:.*]] ]
-// CHECK-NEXT:    ret i32 [[FPCLASSIFY_RESULT]]
-// CHECK:       [[FPCLASSIFY_NOT_ZERO]]:
-// CHECK-NEXT:    [[CMP:%.*]] = fcmp uno double [[TMP0]], [[TMP0]]
-// CHECK-NEXT:    br i1 [[CMP]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_NAN]]
+// CHECK-NEXT:    [[TMP1:%.*]] = call i1 @llvm.is.fpclass.f64(double [[TMP0]], i32 3)
+// CHECK-NEXT:    br i1 [[TMP1]], label %[[FPCLASSIFY_END:.*]], label %[[FPCLASSIFY_NOT_NAN:.*]]
 // CHECK:       [[FPCLASSIFY_NOT_NAN]]:
-// CHECK-NEXT:    [[TMP1:%.*]] = call double @llvm.fabs.f64(double [[TMP0]]) #[[ATTR2]]
-// CHECK-NEXT:    [[ISINF:%.*]] = fcmp oeq double [[TMP1]], 0x7FF0000000000000
-// CHECK-NEXT:    br i1 [[ISINF]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_INF]]
-// CHECK:       [[FPCLASSIFY_NOT_INF]]:
-// CHECK-NEXT:    [[ISNORMAL:%.*]] = fcmp uge double [[TMP1]], 0x10000000000000
-// CHECK-NEXT:    [[TMP2]] = select i1 [[ISNORMAL]], i32 264, i32 144
+// CHECK-NEXT:    [[TMP2:%.*]] = call i1 @llvm.is.fpclass.f64(double [[TMP0]], i32 516)
+// CHECK-NEXT:    br i1 [[TMP2]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_INFINITE:.*]]
+// CHECK:       [[FPCLASSIFY_NOT_INFINITE]]:
+// CHECK-NEXT:    [[TMP3:%.*]] = call i1 @llvm.is.fpclass.f64(double [[TMP0]], i32 264)
+// CHECK-NEXT:    br i1 [[TMP3]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_NORMAL:.*]]
+// CHECK:       [[FPCLASSIFY_NOT_NORMAL]]:
+// CHECK-NEXT:    [[TMP4:%.*]] = call i1 @llvm.is.fpclass.f64(double [[TMP0]], i32 144)
+// CHECK-NEXT:    br i1 [[TMP4]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_SUBNORMAL:.*]]
+// CHECK:       [[FPCLASSIFY_NOT_SUBNORMAL]]:
 // CHECK-NEXT:    br label %[[FPCLASSIFY_END]]
+// CHECK:       [[FPCLASSIFY_END]]:
+// CHECK-NEXT:    [[FPCLASSIFY_RESULT:%.*]] = phi i32 [ 3, %[[ENTRY]] ], [ 516, %[[FPCLASSIFY_NOT_NAN]] ], [ 264, %[[FPCLASSIFY_NOT_INFINITE]] ], [ 144, %[[FPCLASSIFY_NOT_NORMAL]] ], [ 96, %[[FPCLASSIFY_NOT_SUBNORMAL]] ]
+// CHECK-NEXT:    ret i32 [[FPCLASSIFY_RESULT]]
 //
 int test_fpclassify_double(double x) {
   return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL,
@@ -191,22 +191,22 @@ int test_fpclassify_double(double x) {
 // CHECK-NEXT:    [[X_ADDR:%.*]] = alloca x86_fp80, align 16
 // CHECK-NEXT:    store x86_fp80 [[X]], ptr [[X_ADDR]], align 16
 // CHECK-NEXT:    [[TMP0:%.*]] = load x86_fp80, ptr [[X_ADDR]], align 16
-// CHECK-NEXT:    [[ISZERO:%.*]] = fcmp oeq x86_fp80 [[TMP0]], 0xK00000000000000000000
-// CHECK-NEXT:    br i1 [[ISZERO]], label %[[FPCLASSIFY_END:.*]], label %[[FPCLASSIFY_NOT_ZERO:.*]]
-// CHECK:       [[FPCLASSIFY_END]]:
-// CHECK-NEXT:    [[FPCLASSIFY_RESULT:%.*]] = phi i32 [ 96, %[[ENTRY]] ], [ 3, %[[FPCLASSIFY_NOT_ZERO]] ], [ 516, %[[FPCLASSIFY_NOT_NAN:.*]] ], [ [[TMP2:%.*]], %[[FPCLASSIFY_NOT_INF:.*]] ]
-// CHECK-NEXT:    ret i32 [[FPCLASSIFY_RESULT]]
-// CHECK:       [[FPCLASSIFY_NOT_ZERO]]:
-// CHECK-NEXT:    [[CMP:%.*]] = fcmp uno x86_fp80 [[TMP0]], [[TMP0]]
-// CHECK-NEXT:    br i1 [[CMP]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_NAN]]
+// CHECK-NEXT:    [[TMP1:%.*]] = call i1 @llvm.is.fpclass.f80(x86_fp80 [[TMP0]], i32 3)
+// CHECK-NEXT:    br i1 [[TMP1]], label %[[FPCLASSIFY_END:.*]], label %[[FPCLASSIFY_NOT_NAN:.*]]
 // CHECK:       [[FPCLASSIFY_NOT_NAN]]:
-// CHECK-NEXT:    [[TMP1:%.*]] = call x86_fp80 @llvm.fabs.f80(x86_fp80 [[TMP0]]) #[[ATTR2]]
-// CHECK-NEXT:    [[ISINF:%.*]] = fcmp oeq x86_fp80 [[TMP1]], 0xK7FFF8000000000000000
-// CHECK-NEXT:    br i1 [[ISINF]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_INF]]
-// CHECK:       [[FPCLASSIFY_NOT_INF]]:
-// CHECK-NEXT:    [[ISNORMAL:%.*]] = fcmp uge x86_fp80 [[TMP1]], 0xK00018000000000000000
-// CHECK-NEXT:    [[TMP2]] = select i1 [[ISNORMAL]], i32 264, i32 144
+// CHECK-NEXT:    [[TMP2:%.*]] = call i1 @llvm.is.fpclass.f80(x86_fp80 [[TMP0]], i32 516)
+// CHECK-NEXT:    br i1 [[TMP2]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_INFINITE:.*]]
+// CHECK:       [[FPCLASSIFY_NOT_INFINITE]]:
+// CHECK-NEXT:    [[TMP3:%.*]] = call i1 @llvm.is.fpclass.f80(x86_fp80 [[TMP0]], i32 264)
+// CHECK-NEXT:    br i1 [[TMP3]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_NORMAL:.*]]
+// CHECK:       [[FPCLASSIFY_NOT_NORMAL]]:
+// CHECK-NEXT:    [[TMP4:%.*]] = call i1 @llvm.is.fpclass.f80(x86_fp80 [[TMP0]], i32 144)
+// CHECK-NEXT:    br i1 [[TMP4]], label %[[FPCLASSIFY_END]], label %[[FPCLASSIFY_NOT_SUBNORMAL:.*]]
+// CHECK:       [[FPCLASSIFY_NOT_SUBNORMAL]]:
 // CHECK-NEXT:    br label %[[FPCLASSIFY_END]]
+// CHECK:       [[FPCLASSIFY_END]]:
+// CHECK-NEXT:    [[FPCLASSIFY_RESULT:%.*]] = phi i32 [ 3, %[[ENTRY]] ], [ 516, %[[FPCLASSIFY_NOT_NAN]] ], [ 264, %[[FPCLASSIFY_NOT_INFINITE]] ], [ 144, %[[FPCLASSIFY_NOT_NORMAL]] ], [ 96, %[[FPCLASSIFY_NOT_SUBNORMAL]] ]
+// CHECK-NEXT:    ret i32 [[FPCLASSIFY_RESULT]]
 //
 int test_fpclassify_long_double(long double x) {
   return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL,
