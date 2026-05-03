@@ -78,9 +78,9 @@ clang -ffp-exception-behavior=strict main.c -lm
 
     // Entry Block
     Builder.SetInsertPoint(Entry);
-    Value *V = EmitScalarExpr(E->getArg(5));
     Value *NanLiteral = EmitScalarExpr(E->getArg(0));
     Result->addIncoming(NanLiteral, Entry);
+    Value *V = EmitScalarExpr(E->getArg(5));
     Value *IsNan = Builder.createIsFPClass(V, FPClassTest::fcNan);
     Builder.CreateCondBr(IsNan, End, NotNan);
 
