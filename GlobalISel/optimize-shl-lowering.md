@@ -28,8 +28,7 @@ def AArch64PostLegalizerCombiner
 ## llvm/lib/Target/AArch64/GISel/AArch64PostLegalizerCombiner.cpp
 
 ```cpp
-bool matchRemoveZextWhenLoweringShl(MachineInstr &MI,
-                                    MachineRegisterInfo &MRI,
+bool matchRemoveZextWhenLoweringShl(MachineInstr &MI, MachineRegisterInfo &MRI,
                                     Register &MatchInfo) {
   // check Opcode is G_SHL
   assert(MI.getOpcode() == TargetOpcode::G_SHL && "Opcode is not G_SHL");
@@ -67,13 +66,9 @@ bool matchRemoveZextWhenLoweringShl(MachineInstr &MI,
   MatchInfo = Src;
   return true;
 }
-```
 
-```cpp
-void applyRemoveZextWhenLoweringShl(MachineInstr &MI,
-                                    MachineRegisterInfo &MRI,
-                                    MachineIRBuilder &B,
-                                    Register &MatchInfo) {
+void applyRemoveZextWhenLoweringShl(MachineInstr &MI, MachineRegisterInfo &MRI,
+                                    MachineIRBuilder &B, Register &MatchInfo) {
   Register OriginalShiftAmt = MI.getOperand(2).getReg();
   LLT OriginalShiftTy = MRI.getType(OriginalShiftAmt);
   LLT SrcTy = MRI.getType(MatchInfo);
