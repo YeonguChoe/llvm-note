@@ -135,8 +135,57 @@ define i16 @test_shl_i16(i16 %a, i16 %b) {
 - run auto test generation
 ```bash
 llvm/utils/update_llc_test_checks.py \
-  --llc-binary ~/llvm-project/build/bin/llc \
+  --llc-binary build/bin/llc \
   llvm/test/CodeGen/AArch64/GlobalISel/split-wide-shifts-multiway.ll
+```
+
+## llvm/test/CodeGen/AArch64/shift.ll
+
+```bash
+llvm/utils/update_llc_test_checks.py \
+  --llc-binary build/bin/llc \
+  llvm/test/CodeGen/AArch64/shift.ll
+```
+
+## llvm/test/CodeGen/AArch64/select_const.ll
+
+```bash
+llvm/utils/update_llc_test_checks.py \
+  --llc-binary build/bin/llc \
+  llvm/test/CodeGen/AArch64/select_const.ll
+```
+
+
+## llvm/test/CodeGen/AArch64/hoist-and-by-const-from-shl-in-eqcmp-zero.ll
+
+```bash
+llvm/utils/update_llc_test_checks.py \
+  --llc-binary build/bin/llc \
+  llvm/test/CodeGen/AArch64/hoist-and-by-const-from-shl-in-eqcmp-zero.ll
+```
+
+## llvm/test/CodeGen/AArch64/funnel-shift.ll
+
+```bash
+llvm/utils/update_llc_test_checks.py \
+  --llc-binary build/bin/llc \
+  llvm/test/CodeGen/AArch64/funnel-shift.ll
+```
+
+## llvm/test/CodeGen/AArch64/fsh.ll
+
+```bash
+llvm/utils/update_llc_test_checks.py \
+  --llc-binary build/bin/llc \
+  llvm/test/CodeGen/AArch64/fsh.ll
+```
+
+## llvm/test/CodeGen/ARM/frem-power2.ll
+
+```bash
+llvm/utils/update_llc_test_checks.py \
+  --llc-binary build/bin/llc \
+  AArch64/frem-power2.ll
 ```
 
 ### Reference
