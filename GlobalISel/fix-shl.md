@@ -3,7 +3,7 @@
 
 - Stats: https://davemgreen.github.io/gisel.html
 
-## Legalizer
-
+## LLVM IR range
+- bit count: [1, 2^23]
 
 
